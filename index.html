@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Nossa Casa Nova - Oficial</title>
+    <title>Minha Casa Nova - Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .feito { opacity: 0.5; text-decoration: line-through; border-left: 4px solid #10b981 !important; background-color: #f8fafc; }
+        .feito { opacity: 0.5; text-decoration: line-through; border-left: 6px solid #10b981 !important; background-color: #f8fafc; }
         .urgencia-alta { border-left: 6px solid #ef4444; }
         .urgencia-media { border-left: 6px solid #f59e0b; }
         .urgencia-baixa { border-left: 6px solid #3b82f6; }
@@ -20,50 +21,47 @@
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl shadow-lg"><i class="fas fa-home"></i></div>
-                <h1 class="text-2xl font-black text-indigo-900 tracking-tight">A NOSSA CASA NOVA</h1>
+                <h1 class="text-xl font-black text-indigo-900 tracking-tight uppercase">Minha Casa Online</h1>
             </div>
-            <button onclick="resetarLista()" class="bg-white hover:bg-red-50 px-4 py-2 rounded-full text-red-500 font-bold text-[10px] border border-red-100 transition-all shadow-sm">ZERAR E RECOMEÇAR</button>
+            <div id="status" class="text-[10px] font-bold text-emerald-500 uppercase">● Sincronizado</div>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
                 <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Concluído</p>
                 <h3 id="progresso-texto" class="text-3xl font-black text-indigo-600">0%</h3>
             </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Itens Comprados</p>
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
+                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Comprados</p>
                 <h3 id="count-temos" class="text-3xl font-black text-emerald-500">0</h3>
             </div>
-            <div class="bg-indigo-600 p-5 rounded-2xl shadow-xl text-white">
+            <div class="bg-indigo-600 p-5 rounded-2xl shadow-xl text-white text-center">
                 <p class="text-[10px] text-indigo-200 font-bold uppercase mb-1">Falta Investir</p>
-                <h3 id="total-preco" class="text-3xl font-black italic">R$ 0,00</h3>
+                <h3 id="total-preco" class="text-3xl font-black">R$ 0,00</h3>
             </div>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-md border border-indigo-50 p-6 mb-10">
-            <h2 class="text-xs font-black text-indigo-900 mb-5 uppercase tracking-widest flex items-center gap-2">
-                <i class="fas fa-plus-circle"></i> Adicionar novo item na lista
-            </h2>
+        <div class="bg-white rounded-3xl shadow-md border p-6 mb-10">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Nome do Item</label>
-                    <input type="text" id="itemInput" placeholder="Ex: Geladeira, Sofá..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:border-indigo-500 transition-all">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Nome do Item</label>
+                    <input type="text" id="itemInput" placeholder="Ex: Geladeira..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none focus:border-indigo-500">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Preço (R$)</label>
-                    <input type="number" id="precoInput" placeholder="0.00" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 outline-none focus:border-indigo-500">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Preço (R$)</label>
+                    <input type="number" id="precoInput" placeholder="0.00" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Urgência</label>
-                    <select id="urgenciaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 bg-white outline-none focus:border-indigo-500">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Urgência</label>
+                    <select id="urgenciaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
                         <option value="urgencia-alta">ALTA</option>
                         <option value="urgencia-media" selected>MÉDIA</option>
                         <option value="urgencia-baixa">BAIXA</option>
                     </select>
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">Área</label>
-                    <select id="areaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-3 bg-white outline-none focus:border-indigo-500">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Área</label>
+                    <select id="areaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
                         <option value="Reforma">REFORMA</option>
                         <option value="Cozinha">COZINHA</option>
                         <option value="Quarto">QUARTO</option>
@@ -72,41 +70,39 @@
                         <option value="Lavanderia">LAVANDERIA</option>
                     </select>
                 </div>
-                <button onclick="addItem()" class="md:col-span-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest">
-                    Adicionar agora
-                </button>
+                <button onclick="addItem()" class="md:col-span-5 bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase active:scale-95 transition-all">Adicionar à Nuvem</button>
             </div>
         </div>
 
         <nav class="flex gap-6 border-b border-slate-200 mb-8 overflow-x-auto pb-2 no-scrollbar">
-            <button onclick="changeTab('Todos')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Todos</button>
-            <button onclick="changeTab('Reforma')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Reforma</button>
-            <button onclick="changeTab('Cozinha')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Cozinha</button>
-            <button onclick="changeTab('Quarto')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Quarto</button>
-            <button onclick="changeTab('Sala')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Sala</button>
-            <button onclick="changeTab('Banheiro')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Banheiro</button>
-            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-3 px-2 text-slate-400 whitespace-nowrap font-bold uppercase text-xs">Lavanderia</button>
+            <button onclick="changeTab('Todos')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Todos</button>
+            <button onclick="changeTab('Reforma')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Reforma</button>
+            <button onclick="changeTab('Cozinha')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Cozinha</button>
+            <button onclick="changeTab('Quarto')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Quarto</button>
+            <button onclick="changeTab('Sala')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Sala</button>
+            <button onclick="changeTab('Banheiro')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Banheiro</button>
+            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Lavanderia</button>
         </nav>
 
         <div id="listaContainer" class="space-y-4"></div>
     </div>
 
     <script>
-        const iniciais = [
-            { nome: "Piso e Azulejo", preco: 2500, urgencia: "urgencia-media", area: "Reforma", feito: false },
-            { nome: "Geladeira Duplex", preco: 3200, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
-            { nome: "Fogão 4 Bocas", preco: 900, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
-            { nome: "Cama Box Casal", preco: 1800, urgencia: "urgencia-alta", area: "Quarto", feito: false },
-            { nome: "Sofá 3 Lugares", preco: 2200, urgencia: "urgencia-alta", area: "Sala", feito: false },
-            { nome: "Máquina de Lavar", preco: 1900, urgencia: "urgencia-alta", area: "Lavanderia", feito: false }
-        ];
+        const _URL = 'https://sqzdplfetyykxgwcyxnv.supabase.co';
+        const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
+        const supabase = supabase.createClient(_URL, _KEY);
 
-        let itens = JSON.parse(localStorage.getItem('casa_master_v1')) || iniciais;
+        let itens = [];
         let currentTab = 'Todos';
 
-        function salvar() {
-            localStorage.setItem('casa_master_v1', JSON.stringify(itens));
-            render();
+        async function carregar() {
+            document.getElementById('status').innerText = '⏳ Carregando...';
+            const { data, error } = await supabase.from('lista_casa').select('*').order('id', { ascending: true });
+            if (data) {
+                itens = data;
+                render();
+                document.getElementById('status').innerText = '● Sincronizado';
+            }
         }
 
         function render() {
@@ -119,22 +115,20 @@
             const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
 
             filtrados.forEach((item) => {
-                const idx = itens.indexOf(item);
                 if(!item.feito) total += item.preco; else temos++;
-
                 container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center transition-all ${item.feito ? 'feito' : item.urgencia}">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
                         <div class="flex items-center gap-4">
-                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${idx})" class="w-7 h-7 rounded-lg text-indigo-600 border-slate-200">
+                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg text-indigo-600">
                             <div>
                                 <p class="font-black text-slate-800 text-lg leading-tight">${item.nome}</p>
                                 <div class="flex gap-2 items-center mt-1">
                                     <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded font-black text-slate-400 uppercase">${item.area}</span>
-                                    <span class="text-xs font-bold text-indigo-600">R$ ${item.preco.toLocaleString('pt-BR')}</span>
+                                    <span class="text-xs font-bold text-indigo-600">R$ ${Number(item.preco).toLocaleString('pt-BR')}</span>
                                 </div>
                             </div>
                         </div>
-                        <button onclick="remove(${idx})" class="text-slate-200 hover:text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="remover(${item.id})" class="bg-red-50 text-red-500 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             });
@@ -144,31 +138,39 @@
             document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
         }
 
-        function addItem() {
+        async function addItem() {
             const nome = document.getElementById('itemInput');
             const preco = document.getElementById('precoInput');
             const urgencia = document.getElementById('urgenciaInput');
             const area = document.getElementById('areaInput');
 
             if(nome.value.trim()) {
-                itens.push({
-                    nome: nome.value,
-                    preco: parseFloat(preco.value) || 0,
-                    urgencia: urgencia.value,
-                    area: area.value,
-                    feito: false
-                });
+                await supabase.from('lista_casa').insert([{ 
+                    nome: nome.value, 
+                    preco: parseFloat(preco.value) || 0, 
+                    urgencia: urgencia.value, 
+                    area: area.value 
+                }]);
                 nome.value = ''; preco.value = '';
-                salvar();
+                carregar();
             }
         }
 
-        function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
-        function remove(i) { if(confirm('Excluir este item?')) { itens.splice(i, 1); salvar(); } }
-        function changeTab(t) { currentTab = t; render(); }
-        function resetarLista() { if(confirm('Isso vai apagar tudo e resetar para a lista padrão. Confirmar?')) { itens = JSON.parse(JSON.stringify(iniciais)); salvar(); } }
+        async function toggle(id, estado) {
+            await supabase.from('lista_casa').update({ feito: !estado }).eq('id', id);
+            carregar();
+        }
 
-        render();
+        async function remover(id) {
+            if(confirm('Excluir este item da nuvem?')) {
+                await supabase.from('lista_casa').delete().eq('id', id);
+                carregar();
+            }
+        }
+
+        function changeTab(t) { currentTab = t; render(); }
+
+        carregar();
     </script>
 </body>
 </html>
