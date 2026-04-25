@@ -7,11 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        .done { opacity: 0.5; text-decoration: line-through; border-left: 4px solid #10b981 !important; background-color: #f8fafc; }
+        .feito { opacity: 0.5; text-decoration: line-through; border-left: 4px solid #10b981 !important; background-color: #f8fafc; }
         .urgencia-alta { border-left: 4px solid #ef4444; }
         .urgencia-media { border-left: 4px solid #f59e0b; }
         .urgencia-baixa { border-left: 4px solid #3b82f6; }
-        .tab-active { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: bold; }
+        .tab-ativa { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 p-4 md:p-8 font-sans">
@@ -21,7 +21,7 @@
             <h1 class="text-2xl font-bold text-indigo-900">A Nossa Casa Nova</h1>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-white p-4 rounded-xl shadow-sm border">
                 <p class="text-[10px] text-slate-500 font-bold uppercase">Progresso</p>
                 <h3 id="progresso-texto" class="text-2xl font-bold text-indigo-600">0%</h3>
@@ -30,27 +30,38 @@
                 <p class="text-[10px] text-slate-500 font-bold uppercase">Já Temos</p>
                 <h3 id="count-temos" class="text-2xl font-bold text-green-600">0</h3>
             </div>
-            <div class="bg-indigo-900 p-4 rounded-xl shadow-lg col-span-2 text-white">
+            <div class="bg-indigo-900 p-4 rounded-xl shadow-lg text-white">
                 <p class="text-[10px] text-indigo-300 font-bold uppercase">Falta Investir</p>
                 <h3 id="total-preco" class="text-2xl font-bold">R$ 0,00</h3>
             </div>
         </div>
 
-        <nav class="flex gap-6 border-b mb-8 overflow-x-auto pb-1">
-            <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400">Todos</button>
-            <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400">Cozinha</button>
-            <button onclick="changeTab('Quarto')" class="tab-btn pb-4 px-2 text-slate-400">Quarto</button>
-            </nav>
+        <nav class="flex gap-6 border-b mb-8 overflow-x-auto pb-1 no-scrollbar">
+            <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Todos</button>
+            <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Cozinha</button>
+            <button onclick="changeTab('Quarto')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Quarto</button>
+            <button onclick="changeTab('Sala')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Sala</button>
+            <button onclick="changeTab('Banheiro')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Banheiro</button>
+            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Lavanderia</button>
+        </nav>
 
         <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <input type="text" id="itemInput" placeholder="Item..." class="border rounded-lg px-4 py-2">
-                <input type="number" id="precoInput" placeholder="Preço" class="border rounded-lg px-4 py-2">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <input type="text" id="itemInput" placeholder="Nome do item..." class="border rounded-lg px-4 py-2 col-span-1 md:col-span-2">
+                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2">
+                <select id="urgenciaInput" class="border rounded-lg px-4 py-2">
+                    <option value="urgencia-baixa">Urgência: Baixa</option>
+                    <option value="urgencia-media">Urgência: Média</option>
+                    <option value="urgencia-alta">Urgência: Alta</option>
+                </select>
                 <select id="areaInput" class="border rounded-lg px-4 py-2">
                     <option value="Cozinha">Cozinha</option>
                     <option value="Quarto">Quarto</option>
+                    <option value="Sala">Sala</option>
+                    <option value="Banheiro">Banheiro</option>
+                    <option value="Lavanderia">Lavanderia</option>
                 </select>
-                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg">Adicionar</button>
+                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg md:col-span-5 hover:bg-indigo-700 transition-colors">Adicionar Item</button>
             </div>
         </div>
 
@@ -58,52 +69,75 @@
     </div>
 
     <script>
-        let itens = JSON.parse(localStorage.getItem('listaCasa')) || [];
+        let itens = JSON.parse(localStorage.getItem('listaCasaNova')) || [];
         let currentTab = 'Todos';
 
         function salvar() {
-            localStorage.setItem('listaCasa', JSON.stringify(itens));
+            localStorage.setItem('listaCasaNova', JSON.stringify(itens));
             render();
         }
 
         function render() {
             const container = document.getElementById('listaContainer');
+            const tabs = document.querySelectorAll('.tab-btn');
             container.innerHTML = '';
-            let total = 0;
-            let temos = 0;
+            let totalPendente = 0;
+            let totalTemos = 0;
+
+            tabs.forEach(tab => {
+                if(tab.innerText === currentTab) tab.classList.add('tab-ativa');
+                else tab.classList.remove('tab-ativa');
+            });
 
             const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
 
             filtrados.forEach((item, index) => {
-                if(!item.feito) total += (item.preco * item.qtd);
-                else temos++;
+                const originalIndex = itens.indexOf(item);
+                if(!item.feito) totalPendente += item.preco;
+                else totalTemos++;
 
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${item.feito ? 'done' : ''}">
-                        <div>
-                            <button onclick="toggle(${itens.indexOf(item)})" class="font-bold">${item.nome}</button>
-                            <p class="text-xs text-slate-400">R$ ${item.preco} - ${item.area}</p>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
+                        <div class="flex items-center gap-4">
+                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${originalIndex})" class="w-5 h-5 rounded text-indigo-600">
+                            <div>
+                                <p class="font-bold text-slate-800">${item.nome}</p>
+                                <p class="text-xs text-slate-400">R$ ${item.preco.toLocaleString('pt-BR')} | ${item.area}</p>
+                            </div>
                         </div>
-                        <button onclick="remove(${itens.indexOf(item)})" class="text-rose-500"><i class="fas fa-trash"></i></button>
+                        <button onclick="remove(${originalIndex})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
             });
 
-            document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
-            document.getElementById('count-temos').innerText = temos;
-            document.getElementById('progresso-texto').innerText = itens.length > 0 ? Math.round((temos/itens.length)*100) + "%" : "0%";
+            document.getElementById('total-preco').innerText = "R$ " + totalPendente.toLocaleString('pt-BR');
+            document.getElementById('count-temos').innerText = totalTemos;
+            const progresso = itens.length > 0 ? Math.round((totalTemos / itens.length) * 100) : 0;
+            document.getElementById('progresso-texto').innerText = progresso + "%";
         }
 
         function addItem() {
-            const n = document.getElementById('itemInput'), p = document.getElementById('precoInput'), a = document.getElementById('areaInput');
-            if(n.value) {
-                itens.push({ nome: n.value, preco: parseFloat(p.value) || 0, area: a.value, feito: false, qtd: 1 });
-                n.value = ''; p.value = ''; salvar();
+            const nome = document.getElementById('itemInput');
+            const preco = document.getElementById('precoInput');
+            const urgencia = document.getElementById('urgenciaInput');
+            const area = document.getElementById('areaInput');
+
+            if(nome.value && preco.value) {
+                itens.push({
+                    nome: nome.value,
+                    preco: parseFloat(preco.value),
+                    urgencia: urgencia.value,
+                    area: area.value,
+                    feito: false
+                });
+                nome.value = '';
+                preco.value = '';
+                salvar();
             }
         }
 
         function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
-        function remove(i) { itens.splice(i, 1); salvar(); }
+        function remove(i) { if(confirm('Excluir este item?')) { itens.splice(i, 1); salvar(); } }
         function changeTab(t) { currentTab = t; render(); }
 
         render();
