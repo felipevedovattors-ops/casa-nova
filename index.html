@@ -20,27 +20,49 @@
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl"><i class="fas fa-home"></i></div>
-                <h1 class="text-2xl font-bold text-indigo-900 text-lg md:text-2xl">A Nossa Casa Nova</h1>
+                <h1 class="text-2xl font-bold text-indigo-900">A Nossa Casa Nova</h1>
             </div>
-            <button onclick="resetarLista()" class="text-[9px] md:text-[10px] bg-amber-100 hover:bg-amber-200 px-3 py-2 rounded shadow-sm text-amber-700 font-bold uppercase transition-all">Zerar e Sugerir Preços</button>
+            <button onclick="resetarLista()" class="text-[10px] bg-amber-100 px-3 py-2 rounded text-amber-700 font-bold uppercase">Zerar/Sugerir</button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-[10px] text-slate-500 font-bold uppercase">Progresso</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Progresso</p>
                 <h3 id="progresso-texto" class="text-2xl font-bold text-indigo-600">0%</h3>
             </div>
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-[10px] text-slate-500 font-bold uppercase">Já Temos</p>
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Já Temos</p>
                 <h3 id="count-temos" class="text-2xl font-bold text-green-600">0</h3>
             </div>
             <div class="bg-indigo-900 p-4 rounded-xl shadow-lg text-white">
-                <p class="text-[10px] text-indigo-300 font-bold uppercase">Falta Investir</p>
+                <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">Falta Investir</p>
                 <h3 id="total-preco" class="text-2xl font-bold">R$ 0,00</h3>
             </div>
         </div>
 
-        <nav class="flex gap-4 md:gap-6 border-b mb-8 overflow-x-auto pb-1 no-scrollbar text-sm md:text-base">
+        <div class="bg-white rounded-2xl shadow-sm border p-6 mb-8">
+            <h2 class="text-sm font-bold text-slate-700 mb-4 uppercase tracking-widest text-center md:text-left">Adicionar Novo Item</h2>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+                <input type="text" id="itemInput" placeholder="Ex: Micro-ondas..." class="border rounded-lg px-4 py-2 col-span-1 md:col-span-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                <select id="urgenciaInput" class="border rounded-lg px-4 py-2 bg-white">
+                    <option value="urgencia-alta">Urgência: Alta</option>
+                    <option value="urgencia-media" selected>Urgência: Média</option>
+                    <option value="urgencia-baixa">Urgência: Baixa</option>
+                </select>
+                <select id="areaInput" class="border rounded-lg px-4 py-2 bg-white">
+                    <option value="Reforma">Área: Reforma</option>
+                    <option value="Cozinha">Área: Cozinha</option>
+                    <option value="Quarto">Área: Quarto</option>
+                    <option value="Sala">Área: Sala</option>
+                    <option value="Banheiro">Área: Banheiro</option>
+                    <option value="Lavanderia">Área: Lavanderia</option>
+                </select>
+                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-3 rounded-lg md:col-span-5 hover:bg-indigo-700 shadow-md">Adicionar à Lista</button>
+            </div>
+        </div>
+
+        <nav class="flex gap-6 border-b mb-8 overflow-x-auto pb-1 no-scrollbar text-sm md:text-base">
             <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Todos</button>
             <button onclick="changeTab('Reforma')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Reforma</button>
             <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Cozinha</button>
@@ -64,11 +86,11 @@
             { nome: "Máquina de Lavar", preco: 1900, urgencia: "urgencia-alta", area: "Lavanderia", feito: false }
         ];
 
-        let itens = JSON.parse(localStorage.getItem('casa_nova_v_final')) || iniciais;
+        let itens = JSON.parse(localStorage.getItem('casa_nova_v_master')) || iniciais;
         let currentTab = 'Todos';
 
         function salvar() {
-            localStorage.setItem('casa_nova_v_final', JSON.stringify(itens));
+            localStorage.setItem('casa_nova_v_master', JSON.stringify(itens));
             render();
         }
 
@@ -98,7 +120,7 @@
                                 </div>
                             </div>
                         </div>
-                        <button onclick="remove(${idx})" class="text-slate-200 hover:text-rose-500"><i class="fas fa-trash"></i></button>
+                        <button onclick="remove(${idx})" class="text-slate-200 hover:text-rose-500"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             });
@@ -108,9 +130,28 @@
             document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
         }
 
+        function addItem() {
+            const nome = document.getElementById('itemInput');
+            const preco = document.getElementById('precoInput');
+            const urgencia = document.getElementById('urgenciaInput');
+            const area = document.getElementById('areaInput');
+
+            if(nome.value.trim()) {
+                itens.push({
+                    nome: nome.value,
+                    preco: parseFloat(preco.value) || 0,
+                    urgencia: urgencia.value,
+                    area: area.value,
+                    feito: false
+                });
+                nome.value = ''; preco.value = '';
+                salvar();
+            }
+        }
+
         function updatePreco(i, v) { itens[i].preco = parseFloat(v) || 0; salvar(); }
         function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
-        function remove(i) { if(confirm('Remover?')) { itens.splice(i, 1); salvar(); } }
+        function remove(i) { if(confirm('Remover item?')) { itens.splice(i, 1); salvar(); } }
         function changeTab(t) { currentTab = t; render(); }
         function resetarLista() { if(confirm('Zerar e carregar sugestões?')) { itens = JSON.parse(JSON.stringify(iniciais)); salvar(); } }
 
