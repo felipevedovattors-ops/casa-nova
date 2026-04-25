@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Nossa Casa Nova - Master Pro</title>
+    <title>A Nossa Casa Nova</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,7 +15,6 @@
     </style>
 </head>
 <body class="bg-slate-50 p-4 md:p-8 font-sans">
-
     <div class="max-w-5xl mx-auto">
         <header class="flex items-center gap-3 mb-8">
             <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl"><i class="fas fa-home"></i></div>
@@ -23,177 +22,89 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Progresso</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border">
+                <p class="text-[10px] text-slate-500 font-bold uppercase">Progresso</p>
                 <h3 id="progresso-texto" class="text-2xl font-bold text-indigo-600">0%</h3>
-                <div class="w-full bg-slate-100 h-2 rounded-full mt-2">
-                    <div id="progresso-barra" class="bg-indigo-600 h-2 rounded-full transition-all" style="width: 0%"></div>
-                </div>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Já Temos</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border">
+                <p class="text-[10px] text-slate-500 font-bold uppercase">Já Temos</p>
                 <h3 id="count-temos" class="text-2xl font-bold text-green-600">0</h3>
             </div>
-            <div class="bg-indigo-900 p-4 rounded-xl shadow-lg col-span-2">
-                <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">Falta Investir (Ainda não comprados)</p>
-                <h3 id="total-preco" class="text-2xl font-bold text-white">R$ 0,00</h3>
+            <div class="bg-indigo-900 p-4 rounded-xl shadow-lg col-span-2 text-white">
+                <p class="text-[10px] text-indigo-300 font-bold uppercase">Falta Investir</p>
+                <h3 id="total-preco" class="text-2xl font-bold">R$ 0,00</h3>
             </div>
         </div>
 
-        <nav id="tabs" class="flex gap-6 border-b mb-8 overflow-x-auto pb-1">
-            <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap font-bold"><i class="fas fa-list"></i> Todos</button>
-            <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-utensils"></i> Cozinha</button>
-            <button onclick="changeTab('Quarto')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-bed"></i> Quarto</button>
-            <button onclick="changeTab('Sala')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-couch"></i> Sala</button>
-            <button onclick="changeTab('Banheiro')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-bath"></i> Banheiro</button>
-            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-4 px-2 text-slate-400 hover:text-indigo-600 flex items-center gap-2 whitespace-nowrap"><i class="fas fa-tshirt"></i> Lavanderia</button>
-        </nav>
+        <nav class="flex gap-6 border-b mb-8 overflow-x-auto pb-1">
+            <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400">Todos</button>
+            <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400">Cozinha</button>
+            <button onclick="changeTab('Quarto')" class="tab-btn pb-4 px-2 text-slate-400">Quarto</button>
+            </nav>
 
         <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <input type="text" id="itemInput" placeholder="Nome do item..." class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
-                <select id="urgenciaInput" class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                    <option value="Alta">Urgência: Alta</option>
-                    <option value="Media" selected>Urgência: Média</option>
-                    <option value="Baixa">Urgência: Baixa</option>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <input type="text" id="itemInput" placeholder="Item..." class="border rounded-lg px-4 py-2">
+                <input type="number" id="precoInput" placeholder="Preço" class="border rounded-lg px-4 py-2">
+                <select id="areaInput" class="border rounded-lg px-4 py-2">
+                    <option value="Cozinha">Cozinha</option>
+                    <option value="Quarto">Quarto</option>
                 </select>
-                <select id="areaInput" class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
-                    <option value="Cozinha">Área: Cozinha</option>
-                    <option value="Quarto">Área: Quarto</option>
-                    <option value="Sala">Área: Sala</option>
-                    <option value="Banheiro">Área: Banheiro</option>
-                    <option value="Lavanderia">Área: Lavanderia</option>
-                </select>
-                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg hover:bg-indigo-700 transition">Adicionar</button>
+                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg">Adicionar</button>
             </div>
         </div>
 
-        <h2 id="tabTitle" class="text-xl font-bold text-slate-800 mb-4">Inventário Geral</h2>
         <div id="listaContainer" class="space-y-3 pb-20"></div>
     </div>
 
     <script>
+        let itens = JSON.parse(localStorage.getItem('listaCasa')) || [];
         let currentTab = 'Todos';
-        // ITENS BÁSICOS PRÉ-CARREGADOS
-        let itens = [
-            { nome: "Geladeira", preco: 2800, urgencia: "Alta", feito: false, qtd: 1, area: "Cozinha" },
-            { nome: "Fogão", preco: 900, urgencia: "Alta", feito: false, qtd: 1, area: "Cozinha" },
-            { nome: "Cama Box Casal", preco: 1500, urgencia: "Alta", feito: false, qtd: 1, area: "Quarto" },
-            { nome: "Máquina de Lavar", preco: 1800, urgencia: "Alta", feito: false, qtd: 1, area: "Lavanderia" },
-            { nome: "Sofá", preco: 1600, urgencia: "Media", feito: false, qtd: 1, area: "Sala" },
-            { nome: "Chuveiro Elétrico", preco: 150, urgencia: "Alta", feito: false, qtd: 1, area: "Banheiro" },
-            { nome: "Micro-ondas", preco: 600, urgencia: "Media", feito: false, qtd: 1, area: "Cozinha" },
-            { nome: "Guarda-roupa", preco: 1200, urgencia: "Alta", feito: false, qtd: 1, area: "Quarto" },
-            { nome: "Jogo de Panelas", preco: 350, urgencia: "Alta", feito: false, qtd: 1, area: "Cozinha" },
-            { nome: "Mesa de Jantar", preco: 800, urgencia: "Media", feito: false, qtd: 1, area: "Sala" }
-        ];
+
+        function salvar() {
+            localStorage.setItem('listaCasa', JSON.stringify(itens));
+            render();
+        }
 
         function render() {
             const container = document.getElementById('listaContainer');
             container.innerHTML = '';
-            
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('tab-active');
-                if(btn.innerText.includes(currentTab)) btn.classList.add('tab-active');
-            });
+            let total = 0;
+            let temos = 0;
 
-            document.getElementById('tabTitle').innerText = currentTab === 'Todos' ? 'Inventário Geral' : currentTab;
+            const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
 
-            let temosCount = 0;
-            let faltaPagarTotalGeral = 0;
-            
-            itens.forEach(item => {
-                if(item.feito) {
-                    temosCount++;
-                } else {
-                    faltaPagarTotalGeral += (item.preco * item.qtd);
-                }
-            });
+            filtrados.forEach((item, index) => {
+                if(!item.feito) total += (item.preco * item.qtd);
+                else temos++;
 
-            const progresso = itens.length > 0 ? Math.round((temosCount / itens.length) * 100) : 0;
-            document.getElementById('progresso-texto').innerText = progresso + '%';
-            document.getElementById('progresso-barra').style.width = progresso + '%';
-
-            const itensExibidos = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
-
-            itensExibidos.forEach((item) => {
-                const originalIndex = itens.indexOf(item);
-                const urgClass = `urgencia-${item.urgencia.toLowerCase().replace('é','e')}`;
-                
                 container.innerHTML += `
-                    <div class="bg-white flex items-center justify-between p-4 rounded-xl shadow-sm border ${item.feito ? 'done' : urgClass}">
-                        <div class="flex items-center gap-4 flex-1">
-                            <button onclick="toggleDone(${originalIndex})" class="w-8 h-8 rounded-full border-2 flex items-center justify-center transition-colors ${item.feito ? 'bg-green-500 border-green-500 text-white' : 'border-slate-300 hover:border-indigo-500'}">
-                                ${item.feito ? '<i class="fas fa-check"></i>' : ''}
-                            </button>
-                            <div>
-                                <h4 class="font-bold text-slate-800">${item.nome} <span class="text-[10px] bg-slate-100 text-slate-400 px-2 rounded ml-1">${item.area}</span></h4>
-                                <p class="text-xs text-slate-400 font-medium">R$ ${item.preco.toLocaleString('pt-BR', {minimumFractionDigits:2})} | Urgência: ${item.urgencia}</p>
-                            </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${item.feito ? 'done' : ''}">
+                        <div>
+                            <button onclick="toggle(${itens.indexOf(item)})" class="font-bold">${item.nome}</button>
+                            <p class="text-xs text-slate-400">R$ ${item.preco} - ${item.area}</p>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <div class="flex items-center bg-slate-50 border rounded-lg p-1">
-                                <button onclick="changeQtd(${originalIndex}, -1)" class="w-6 h-6 text-slate-400 font-bold">-</button>
-                                <span class="px-3 font-bold text-sm">${item.qtd}</span>
-                                <button onclick="changeQtd(${originalIndex}, 1)" class="w-6 h-6 text-slate-400 font-bold">+</button>
-                            </div>
-                            <div class="text-right min-w-[100px]">
-                                <span class="font-bold text-indigo-600 text-sm">R$ ${(item.preco * item.qtd).toLocaleString('pt-BR', {minimumFractionDigits:2})}</span>
-                            </div>
-                            <button onclick="removeItem(${originalIndex})" class="text-slate-200 hover:text-rose-500 p-2"><i class="fas fa-trash"></i></button>
-                        </div>
+                        <button onclick="remove(${itens.indexOf(item)})" class="text-rose-500"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
             });
 
-            document.getElementById('count-temos').innerText = temosCount;
-            document.getElementById('total-preco').innerText = `R$ ${faltaPagarTotalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        }
-
-        function changeTab(tabName) {
-            currentTab = tabName;
-            if(tabName !== 'Todos') document.getElementById('areaInput').value = tabName;
-            render();
+            document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
+            document.getElementById('count-temos').innerText = temos;
+            document.getElementById('progresso-texto').innerText = itens.length > 0 ? Math.round((temos/itens.length)*100) + "%" : "0%";
         }
 
         function addItem() {
-            const nome = document.getElementById('itemInput');
-            const preco = document.getElementById('precoInput');
-            const urgencia = document.getElementById('urgenciaInput');
-            const area = document.getElementById('areaInput');
-
-            if (nome.value.trim() !== '') {
-                itens.push({ 
-                    nome: nome.value, 
-                    preco: parseFloat(preco.value) || 0, 
-                    urgencia: urgencia.value, 
-                    feito: false, 
-                    qtd: 1,
-                    area: area.value 
-                });
-                nome.value = '';
-                preco.value = '';
-                render();
+            const n = document.getElementById('itemInput'), p = document.getElementById('precoInput'), a = document.getElementById('areaInput');
+            if(n.value) {
+                itens.push({ nome: n.value, preco: parseFloat(p.value) || 0, area: a.value, feito: false, qtd: 1 });
+                n.value = ''; p.value = ''; salvar();
             }
         }
 
-        function toggleDone(index) {
-            itens[index].feito = !itens[index].feito;
-            render();
-        }
-
-        function changeQtd(index, val) {
-            if (itens[index].qtd + val > 0) {
-                itens[index].qtd += val;
-                render();
-            }
-        }
-
-        function removeItem(index) {
-            itens.splice(index, 1);
-            render();
-        }
+        function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
+        function remove(i) { itens.splice(i, 1); salvar(); }
+        function changeTab(t) { currentTab = t; render(); }
 
         render();
     </script>
