@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Nossa Casa Nova - Master</title>
+    <title>A Nossa Casa Nova</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -15,11 +15,14 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 p-4 md:p-8 font-sans">
+<body class="bg-slate-50 p-4 md:p-8 font-sans pb-20">
     <div class="max-w-5xl mx-auto">
-        <header class="flex items-center gap-3 mb-8">
-            <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl"><i class="fas fa-home"></i></div>
-            <h1 class="text-2xl font-bold text-indigo-900">A Nossa Casa Nova</h1>
+        <header class="flex justify-between items-center mb-8">
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl"><i class="fas fa-home"></i></div>
+                <h1 class="text-2xl font-bold text-indigo-900">A Nossa Casa Nova</h1>
+            </div>
+            <button onclick="resetarLista()" class="text-[10px] bg-slate-200 px-3 py-1 rounded text-slate-600 font-bold uppercase">Zerar e Sugerir Preços</button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
@@ -47,131 +50,19 @@
             <button onclick="changeTab('Lavanderia')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Lavanderia</button>
         </nav>
 
-        <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <input type="text" id="itemInput" placeholder="Ex: Piso, Geladeira..." class="border rounded-lg px-4 py-2 col-span-1 md:col-span-2">
-                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2">
-                <select id="urgenciaInput" class="border rounded-lg px-4 py-2 bg-white">
-                    <option value="urgencia-alta">Urgência: Alta</option>
-                    <option value="urgencia-media" selected>Urgência: Média</option>
-                    <option value="urgencia-baixa">Urgência: Baixa</option>
-                </select>
-                <select id="areaInput" class="border rounded-lg px-4 py-2 bg-white">
-                    <option value="Reforma">Reforma</option>
-                    <option value="Cozinha">Cozinha</option>
-                    <option value="Quarto">Quarto</option>
-                    <option value="Sala">Sala</option>
-                    <option value="Banheiro">Banheiro</option>
-                    <option value="Lavanderia">Lavanderia</option>
-                </select>
-                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-3 rounded-lg md:col-span-5 hover:bg-indigo-700 shadow-md">Adicionar à Lista</button>
-            </div>
-        </div>
-
-        <div id="listaContainer" class="space-y-3 pb-20"></div>
+        <div id="listaContainer" class="space-y-3"></div>
     </div>
 
     <script>
-        // LISTA BÁSICA INICIAL
-        const itensIniciais = [
-            { nome: "Pintura Geral", preco: 0, urgencia: "urgencia-alta", area: "Reforma", feito: false },
-            { nome: "Piso/Revestimento", preco: 0, urgencia: "urgencia-media", area: "Reforma", feito: false },
-            { nome: "Geladeira", preco: 0, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
-            { nome: "Fogão", preco: 0, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
-            { nome: "Armários de Cozinha", preco: 0, urgencia: "urgencia-media", area: "Cozinha", feito: false },
-            { nome: "Cama Box", preco: 0, urgencia: "urgencia-alta", area: "Quarto", feito: false },
-            { nome: "Guarda-Roupa", preco: 0, urgencia: "urgencia-media", area: "Quarto", feito: false },
-            { nome: "Sofá", preco: 0, urgencia: "urgencia-alta", area: "Sala", feito: false },
-            { nome: "Painel de TV", preco: 0, urgencia: "urgencia-baixa", area: "Sala", feito: false },
-            { nome: "Máquina de Lavar", preco: 0, urgencia: "urgencia-alta", area: "Lavanderia", feito: false },
-            { nome: "Chuveiro", preco: 0, urgencia: "urgencia-alta", area: "Banheiro", feito: false }
-        ];
-
-        let itens = JSON.parse(localStorage.getItem('listaCasaNova_v2'));
-        
-        // Se a lista estiver vazia, carrega a básica
-        if (!itens || itens.length === 0) {
-            itens = itensIniciais;
-        }
-
-        let currentTab = 'Todos';
-
-        function salvar() {
-            localStorage.setItem('listaCasaNova_v2', JSON.stringify(itens));
-            render();
-        }
-
-        function render() {
-            const container = document.getElementById('listaContainer');
-            const tabs = document.querySelectorAll('.tab-btn');
-            container.innerHTML = '';
-            let totalPendente = 0;
-            let totalTemos = 0;
-
-            tabs.forEach(tab => {
-                if(tab.innerText.includes(currentTab)) tab.classList.add('tab-ativa');
-                else tab.classList.remove('tab-ativa');
-            });
-
-            const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
-
-            filtrados.forEach((item) => {
-                const originalIndex = itens.indexOf(item);
-                if(!item.feito) totalPendente += item.preco;
-                else totalTemos++;
-
-                container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
-                        <div class="flex items-center gap-4">
-                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${originalIndex})" class="w-6 h-6 rounded text-indigo-600">
-                            <div>
-                                <p class="font-bold text-slate-800 text-lg">${item.nome}</p>
-                                <div class="flex gap-2 items-center">
-                                    <span class="text-xs font-bold bg-slate-100 px-2 py-0.5 rounded text-slate-500">${item.area}</span>
-                                    <input type="number" value="${item.preco}" onchange="updatePreco(${originalIndex}, this.value)" class="w-24 border rounded px-1 text-sm" placeholder="R$">
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="remove(${originalIndex})" class="text-slate-300 hover:text-rose-500 p-2"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-            });
-
-            document.getElementById('total-preco').innerText = "R$ " + totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2});
-            document.getElementById('count-temos').innerText = totalTemos;
-            const progresso = itens.length > 0 ? Math.round((totalTemos / itens.length) * 100) : 0;
-            document.getElementById('progresso-texto').innerText = progresso + "%";
-        }
-
-        function updatePreco(index, valor) {
-            itens[index].preco = parseFloat(valor) || 0;
-            salvar();
-        }
-
-        function addItem() {
-            const nome = document.getElementById('itemInput');
-            const preco = document.getElementById('precoInput');
-            const urgencia = document.getElementById('urgenciaInput');
-            const area = document.getElementById('areaInput');
-
-            if(nome.value.trim()) {
-                itens.push({
-                    nome: nome.value,
-                    preco: parseFloat(preco.value) || 0,
-                    urgencia: urgencia.value,
-                    area: area.value,
-                    feito: false
-                });
-                nome.value = ''; preco.value = '';
-                salvar();
-            }
-        }
-
-        function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
-        function remove(i) { if(confirm('Remover item?')) { itens.splice(i, 1); salvar(); } }
-        function changeTab(t) { currentTab = t; render(); }
-
-        render();
-    </script>
-</body>
-</html>
+        // LISTA COM VALORES ESTIMADOS (MÉDIA DE MERCADO)
+        const iniciais = [
+            { nome: "Piso e Azulejo", preco: 2500, urgencia: "urgencia-media", area: "Reforma", feito: false },
+            { nome: "Geladeira Duplex", preco: 3200, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
+            { nome: "Fogão 4 Bocas", preco: 900, urgencia: "urgencia-alta", area: "Cozinha", feito: false },
+            { nome: "Micro-ondas", preco: 600, urgencia: "urgencia-media", area: "Cozinha", feito: false },
+            { nome: "Cama Box Casal", preco: 1800, urgencia: "urgencia-alta", area: "Quarto", feito: false },
+            { nome: "Guarda-Roupa Grande", preco: 1500, urgencia: "urgencia-media", area: "Quarto", feito: false },
+            { nome: "Sofá 3 Lugares", preco: 2200, urgencia: "urgencia-alta", area: "Sala", feito: false },
+            { nome: "Smart TV 50'", preco: 2400, urgencia: "urgencia-baixa", area: "Sala", feito: false },
+            { nome: "Chuveiro Eletrônico", preco: 150, urgencia: "urgencia-alta", area: "Banheiro", feito: false },
+            { nome: "Máquina de Lavar 12kg", preco: 1900, urgencia: "urgencia-alta", area: "Lavanderia", feito: false }
