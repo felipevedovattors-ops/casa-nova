@@ -5,86 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Casa Online</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .feito { opacity: 0.5; text-decoration: line-through; border-left: 6px solid #10b981 !important; background-color: #f8fafc; }
+        .feito { opacity: 0.5; text-decoration: line-through; border-left: 6px solid #10b981 !important; }
         .urgencia-alta { border-left: 6px solid #ef4444; }
-        .urgencia-media { border-left: 6px solid #f59e0b; }
-        .urgencia-baixa { border-left: 6px solid #3b82f6; }
-        .tab-ativa { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: bold; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-slate-100 p-4 md:p-8 font-sans pb-20">
-    <div class="max-w-5xl mx-auto">
-        <header class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl shadow-lg"><i class="fas fa-home"></i></div>
-                <h1 class="text-xl font-black text-indigo-900 tracking-tight uppercase">Minha Casa Online</h1>
-            </div>
-            <div id="status" class="text-[10px] font-bold text-emerald-500 uppercase">● Sincronizado</div>
-        </header>
+<body class="bg-slate-100 p-4 font-sans">
+    <div class="max-w-2xl mx-auto bg-white p-6 rounded-2xl shadow-lg">
+        <h1 class="text-2xl font-bold mb-4">Minha Casa Online</h1>
+        <div id="status" class="text-xs text-emerald-500 mb-4">Conectando...</div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Concluído</p>
-                <h3 id="progresso-texto" class="text-3xl font-black text-indigo-600">0%</h3>
-            </div>
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 text-center">
-                <p class="text-[10px] text-slate-400 font-bold uppercase mb-1">Comprados</p>
-                <h3 id="count-temos" class="text-3xl font-black text-emerald-500">0</h3>
-            </div>
-            <div class="bg-indigo-600 p-5 rounded-2xl shadow-xl text-white text-center">
-                <p class="text-[10px] text-indigo-200 font-bold uppercase mb-1">Falta Investir</p>
-                <h3 id="total-preco" class="text-3xl font-black">R$ 0,00</h3>
-            </div>
+        <div class="space-y-4">
+            <input type="text" id="nomeItem" placeholder="O que você quer comprar?" class="w-full border p-3 rounded-xl outline-none focus:border-indigo-500">
+            <input type="number" id="precoItem" placeholder="Preço aproximado (R$)" class="w-full border p-3 rounded-xl outline-none">
+            <button onclick="salvarNovoItem()" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold shadow-lg active:scale-95 transition-all">ADICIONAR À NUVEM</button>
         </div>
 
-        <div class="bg-white rounded-3xl shadow-md border p-6 mb-10">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div class="md:col-span-2">
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">Nome do Item</label>
-                    <input type="text" id="itemInput" placeholder="Ex: Geladeira..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none focus:border-indigo-500">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">Preço (R$)</label>
-                    <input type="number" id="precoInput" placeholder="0.00" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">Urgência</label>
-                    <select id="urgenciaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
-                        <option value="urgencia-alta">ALTA</option>
-                        <option value="urgencia-media" selected>MÉDIA</option>
-                        <option value="urgencia-baixa">BAIXA</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">Área</label>
-                    <select id="areaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
-                        <option value="Reforma">REFORMA</option>
-                        <option value="Cozinha">COZINHA</option>
-                        <option value="Quarto">QUARTO</option>
-                        <option value="Sala">SALA</option>
-                        <option value="Banheiro">BANHEIRO</option>
-                        <option value="Lavanderia">LAVANDERIA</option>
-                    </select>
-                </div>
-                <button onclick="addItem()" class="md:col-span-5 bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase active:scale-95 transition-all">Adicionar à Nuvem</button>
-            </div>
-        </div>
-
-        <nav class="flex gap-6 border-b border-slate-200 mb-8 overflow-x-auto pb-2 no-scrollbar">
-            <button onclick="changeTab('Todos')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Todos</button>
-            <button onclick="changeTab('Reforma')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Reforma</button>
-            <button onclick="changeTab('Cozinha')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Cozinha</button>
-            <button onclick="changeTab('Quarto')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Quarto</button>
-            <button onclick="changeTab('Sala')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Sala</button>
-            <button onclick="changeTab('Banheiro')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Banheiro</button>
-            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Lavanderia</button>
-        </nav>
-
-        <div id="listaContainer" class="space-y-4"></div>
+        <div id="minhaLista" class="mt-8 space-y-3"></div>
     </div>
 
     <script>
@@ -92,85 +30,57 @@
         const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
         const supabase = supabase.createClient(_URL, _KEY);
 
-        let itens = [];
-        let currentTab = 'Todos';
-
-        async function carregar() {
+        async function carregarLista() {
             document.getElementById('status').innerText = '⏳ Carregando...';
-            const { data, error } = await supabase.from('lista_casa').select('*').order('id', { ascending: true });
+            const { data, error } = await supabase.from('lista_casa').select('*').order('id', { ascending: false });
+            
+            const listaElemento = document.getElementById('minhaLista');
+            listaElemento.innerHTML = '';
+            
             if (data) {
-                itens = data;
-                render();
+                data.forEach(item => {
+                    listaElemento.innerHTML += `
+                        <div class="p-4 bg-slate-50 rounded-xl border flex justify-between items-center ${item.feito ? 'feito' : ''}">
+                            <div>
+                                <p class="font-bold text-slate-800">${item.nome}</p>
+                                <p class="text-sm text-indigo-600">R$ ${item.preco.toLocaleString('pt-BR')}</p>
+                            </div>
+                            <button onclick="apagarItem(${item.id})" class="text-red-400 p-2">Apagar</button>
+                        </div>
+                    `;
+                });
                 document.getElementById('status').innerText = '● Sincronizado';
             }
         }
 
-        function render() {
-            const container = document.getElementById('listaContainer');
-            const tabs = document.querySelectorAll('.tab-btn');
-            container.innerHTML = '';
-            let total = 0, temos = 0;
-
-            tabs.forEach(tab => tab.classList.toggle('tab-ativa', tab.innerText.includes(currentTab.toUpperCase())));
-            const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
-
-            filtrados.forEach((item) => {
-                if(!item.feito) total += item.preco; else temos++;
-                container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
-                        <div class="flex items-center gap-4">
-                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg text-indigo-600">
-                            <div>
-                                <p class="font-black text-slate-800 text-lg leading-tight">${item.nome}</p>
-                                <div class="flex gap-2 items-center mt-1">
-                                    <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded font-black text-slate-400 uppercase">${item.area}</span>
-                                    <span class="text-xs font-bold text-indigo-600">R$ ${Number(item.preco).toLocaleString('pt-BR')}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="remover(${item.id})" class="bg-red-50 text-red-500 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                `;
-            });
-
-            document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
-            document.getElementById('count-temos').innerText = temos;
-            document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
-        }
-
-        async function addItem() {
-            const nome = document.getElementById('itemInput');
-            const preco = document.getElementById('precoInput');
-            const urgencia = document.getElementById('urgenciaInput');
-            const area = document.getElementById('areaInput');
-
-            if(nome.value.trim()) {
-                await supabase.from('lista_casa').insert([{ 
-                    nome: nome.value, 
-                    preco: parseFloat(preco.value) || 0, 
-                    urgencia: urgencia.value, 
-                    area: area.value 
+        async function salvarNovoItem() {
+            const n = document.getElementById('nomeItem').value;
+            const p = document.getElementById('precoItem').value;
+            
+            if(n.trim() !== "") {
+                const { error } = await supabase.from('lista_casa').insert([{ 
+                    nome: n, 
+                    preco: parseFloat(p) || 0 
                 }]);
-                nome.value = ''; preco.value = '';
-                carregar();
+                
+                if(!error) {
+                    document.getElementById('nomeItem').value = '';
+                    document.getElementById('precoItem').value = '';
+                    carregarLista();
+                } else {
+                    alert("Erro ao salvar! Verifique o Supabase.");
+                }
             }
         }
 
-        async function toggle(id, estado) {
-            await supabase.from('lista_casa').update({ feito: !estado }).eq('id', id);
-            carregar();
-        }
-
-        async function remover(id) {
-            if(confirm('Excluir este item da nuvem?')) {
+        async function apagarItem(id) {
+            if(confirm('Deseja excluir?')) {
                 await supabase.from('lista_casa').delete().eq('id', id);
-                carregar();
+                carregarLista();
             }
         }
 
-        function changeTab(t) { currentTab = t; render(); }
-
-        carregar();
+        carregarLista();
     </script>
 </body>
 </html>
