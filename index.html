@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Nossa Casa Nova</title>
+    <title>A Nossa Casa Nova - Master</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -12,6 +12,7 @@
         .urgencia-media { border-left: 4px solid #f59e0b; }
         .urgencia-baixa { border-left: 4px solid #3b82f6; }
         .tab-ativa { border-bottom: 3px solid #4f46e5; color: #4f46e5; font-weight: bold; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 p-4 md:p-8 font-sans">
@@ -22,22 +23,23 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <p class="text-[10px] text-slate-500 font-bold uppercase">Progresso</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Progresso</p>
                 <h3 id="progresso-texto" class="text-2xl font-bold text-indigo-600">0%</h3>
             </div>
-            <div class="bg-white p-4 rounded-xl shadow-sm border">
-                <p class="text-[10px] text-slate-500 font-bold uppercase">Já Temos</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Já Temos</p>
                 <h3 id="count-temos" class="text-2xl font-bold text-green-600">0</h3>
             </div>
             <div class="bg-indigo-900 p-4 rounded-xl shadow-lg text-white">
-                <p class="text-[10px] text-indigo-300 font-bold uppercase">Falta Investir</p>
+                <p class="text-[10px] text-indigo-300 font-bold uppercase tracking-wider">Falta Investir</p>
                 <h3 id="total-preco" class="text-2xl font-bold">R$ 0,00</h3>
             </div>
         </div>
 
         <nav class="flex gap-6 border-b mb-8 overflow-x-auto pb-1 no-scrollbar">
             <button onclick="changeTab('Todos')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Todos</button>
+            <button onclick="changeTab('Reforma')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap font-bold text-orange-600"><i class="fas fa-tools mr-1"></i> Reforma</button>
             <button onclick="changeTab('Cozinha')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Cozinha</button>
             <button onclick="changeTab('Quarto')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Quarto</button>
             <button onclick="changeTab('Sala')" class="tab-btn pb-4 px-2 text-slate-400 whitespace-nowrap">Sala</button>
@@ -47,21 +49,22 @@
 
         <div class="bg-white rounded-2xl shadow-sm border p-6 mb-6">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-                <input type="text" id="itemInput" placeholder="Nome do item..." class="border rounded-lg px-4 py-2 col-span-1 md:col-span-2">
-                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2">
-                <select id="urgenciaInput" class="border rounded-lg px-4 py-2">
-                    <option value="urgencia-baixa">Urgência: Baixa</option>
-                    <option value="urgencia-media">Urgência: Média</option>
+                <input type="text" id="itemInput" placeholder="Ex: Piso, Pintura, Sofá..." class="border rounded-lg px-4 py-2 col-span-1 md:col-span-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="number" id="precoInput" placeholder="Preço (R$)" class="border rounded-lg px-4 py-2 outline-none focus:ring-2 focus:ring-indigo-500">
+                <select id="urgenciaInput" class="border rounded-lg px-4 py-2 bg-white">
                     <option value="urgencia-alta">Urgência: Alta</option>
+                    <option value="urgencia-media" selected>Urgência: Média</option>
+                    <option value="urgencia-baixa">Urgência: Baixa</option>
                 </select>
-                <select id="areaInput" class="border rounded-lg px-4 py-2">
-                    <option value="Cozinha">Cozinha</option>
-                    <option value="Quarto">Quarto</option>
-                    <option value="Sala">Sala</option>
-                    <option value="Banheiro">Banheiro</option>
-                    <option value="Lavanderia">Lavanderia</option>
+                <select id="areaInput" class="border rounded-lg px-4 py-2 bg-white">
+                    <option value="Reforma">Área: Reforma</option>
+                    <option value="Cozinha">Área: Cozinha</option>
+                    <option value="Quarto">Área: Quarto</option>
+                    <option value="Sala">Área: Sala</option>
+                    <option value="Banheiro">Área: Banheiro</option>
+                    <option value="Lavanderia">Área: Lavanderia</option>
                 </select>
-                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-2 rounded-lg md:col-span-5 hover:bg-indigo-700 transition-colors">Adicionar Item</button>
+                <button onclick="addItem()" class="bg-indigo-600 text-white font-bold py-3 rounded-lg md:col-span-5 hover:bg-indigo-700 transition-all shadow-md">Adicionar à Lista</button>
             </div>
         </div>
 
@@ -85,32 +88,32 @@
             let totalTemos = 0;
 
             tabs.forEach(tab => {
-                if(tab.innerText === currentTab) tab.classList.add('tab-ativa');
+                if(tab.innerText.includes(currentTab)) tab.classList.add('tab-ativa');
                 else tab.classList.remove('tab-ativa');
             });
 
             const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
 
-            filtrados.forEach((item, index) => {
+            filtrados.forEach((item) => {
                 const originalIndex = itens.indexOf(item);
                 if(!item.feito) totalPendente += item.preco;
                 else totalTemos++;
 
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center transition-all ${item.feito ? 'feito' : item.urgencia}">
                         <div class="flex items-center gap-4">
-                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${originalIndex})" class="w-5 h-5 rounded text-indigo-600">
+                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${originalIndex})" class="w-6 h-6 rounded-md border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer">
                             <div>
-                                <p class="font-bold text-slate-800">${item.nome}</p>
-                                <p class="text-xs text-slate-400">R$ ${item.preco.toLocaleString('pt-BR')} | ${item.area}</p>
+                                <p class="font-bold text-slate-800 text-lg">${item.nome}</p>
+                                <p class="text-sm text-slate-500">R$ ${item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2})} | <span class="uppercase text-[10px] font-bold bg-slate-100 px-2 py-0.5 rounded">${item.area}</span></p>
                             </div>
                         </div>
-                        <button onclick="remove(${originalIndex})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button>
+                        <button onclick="remove(${originalIndex})" class="text-slate-300 hover:text-rose-500 p-2 transition-colors"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
             });
 
-            document.getElementById('total-preco').innerText = "R$ " + totalPendente.toLocaleString('pt-BR');
+            document.getElementById('total-preco').innerText = "R$ " + totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2});
             document.getElementById('count-temos').innerText = totalTemos;
             const progresso = itens.length > 0 ? Math.round((totalTemos / itens.length) * 100) : 0;
             document.getElementById('progresso-texto').innerText = progresso + "%";
@@ -122,7 +125,7 @@
             const urgencia = document.getElementById('urgenciaInput');
             const area = document.getElementById('areaInput');
 
-            if(nome.value && preco.value) {
+            if(nome.value.trim() && preco.value) {
                 itens.push({
                     nome: nome.value,
                     preco: parseFloat(preco.value),
@@ -133,11 +136,13 @@
                 nome.value = '';
                 preco.value = '';
                 salvar();
+            } else {
+                alert("Por favor, preencha o nome e o preço!");
             }
         }
 
         function toggle(i) { itens[i].feito = !itens[i].feito; salvar(); }
-        function remove(i) { if(confirm('Excluir este item?')) { itens.splice(i, 1); salvar(); } }
+        function remove(i) { if(confirm('Remover este item da lista?')) { itens.splice(i, 1); salvar(); } }
         function changeTab(t) { currentTab = t; render(); }
 
         render();
