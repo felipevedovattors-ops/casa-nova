@@ -87,79 +87,67 @@
         <div id="listaContainer" class="space-y-4"></div>
     </div>
 
-    <script>
-        const _URL = 'https://sqzdplfetyykxgwcyxnv.supabase.co';
-        const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
-        const supabase = supabase.createClient(_URL, _KEY);
+   <script>
+    const _URL = 'https://sqzdplfetyykxgwcyxnv.supabase.co';
+    const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
+    
+    // Mudei o nome aqui para 'supabaseClient' para não dar erro
+    const supabaseClient = supabase.createClient(_URL, _KEY);
 
-        let itens = [];
-        let currentTab = 'Todos';
+    let itens = [];
+    let currentTab = 'Todos';
 
-        async function carregar() {
-            document.getElementById('status').innerText = '⏳ Carregando...';
-            const { data } = await supabase.from('lista_casa').select('*').order('id', { ascending: false });
-            if (data) { itens = data; render(); document.getElementById('status').innerText = '● Sincronizado'; }
-        }
+    async function carregar() {
+        document.getElementById('status').innerText = '⏳ Carregando...';
+        const { data, error } = await supabaseClient.from('lista_casa').select('*').order('id', { ascending: false });
+        if (data) { itens = data; render(); document.getElementById('status').innerText = '● Sincronizado'; }
+    }
 
-        function render() {
-            const container = document.getElementById('listaContainer');
-            container.innerHTML = '';
-            let total = 0, temos = 0;
+    function render() {
+        const container = document.getElementById('listaContainer');
+        container.innerHTML = '';
+        let total = 0, temos = 0;
 
-            document.querySelectorAll('.tab-btn').forEach(tab => {
-                tab.classList.toggle('tab-ativa', tab.innerText.toUpperCase() === currentTab.toUpperCase());
-            });
+        document.querySelectorAll('.tab-btn').forEach(tab => {
+            tab.classList.toggle('tab-ativa', tab.innerText.toUpperCase() === currentTab.toUpperCase());
+        });
 
-            const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
+        const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
 
-            filtrados.forEach((item) => {
-                if(!item.feito) total += item.preco; else temos++;
-                container.innerHTML += `
-                    <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
-                        <div class="flex items-center gap-4">
-                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg">
-                            <div>
-                                <p class="font-black text-slate-800 text-lg">${item.nome}</p>
-                                <p class="text-xs font-bold text-indigo-600 uppercase">${item.area} - R$ ${Number(item.preco).toLocaleString('pt-BR')}</p>
-                            </div>
+        filtrados.forEach((item) => {
+            if(!item.feito) total += item.preco; else temos++;
+            container.innerHTML += `
+                <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
+                    <div class="flex items-center gap-4">
+                        <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg">
+                        <div>
+                            <p class="font-black text-slate-800 text-lg">${item.nome}</p>
+                            <p class="text-xs font-bold text-indigo-600 uppercase">${item.area} - R$ ${Number(item.preco).toLocaleString('pt-BR')}</p>
                         </div>
-                        <button onclick="remover(${item.id})" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
-                    </div>`;
-            });
+                    </div>
+                    <button onclick="remover(${item.id})" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+                </div>`;
+        });
 
-            document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
-            document.getElementById('count-temos').innerText = temos;
-            document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
-        }
+        document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
+        document.getElementById('count-temos').innerText = temos;
+        document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
+    }
 
-   async function addItem() {
-    const n = document.getElementById('itemInput');
-    const p = document.getElementById('precoInput');
-    const u = document.getElementById('urgenciaInput');
-    const a = document.getElementById('areaInput');
-
-    if (n.value) {
-        // O comando 'insert' deve bater com os nomes das colunas no banco
-        const { error } = await supabase.from('lista_casa').insert([{ 
-            nome: n.value, 
-            preco: parseFloat(p.value) || 0, 
-            urgencia: u.value, 
-            area: a.value 
-        }]);
-
-        if (error) {
-            alert("Erro ao salvar: " + error.message);
-        } else {
-            n.value = ''; 
-            p.value = ''; 
-            carregar(); 
+    async function addItem() {
+        const n = document.getElementById('itemInput');
+        const p = document.getElementById('precoInput');
+        const u = document.getElementById('urgenciaInput');
+        const a = document.getElementById('areaInput');
+        if(n.value) {
+            // Usando o nome correto aqui também
+            await supabaseClient.from('lista_casa').insert([{ nome: n.value, preco: parseFloat(p.value) || 0, urgencia: u.value, area: a.value }]);
+            n.value = ''; p.value = ''; carregar();
         }
     }
-}
-        async function toggle(id, estado) { await supabase.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
-        async function remover(id) { if(confirm('Excluir?')) { await supabase.from('lista_casa').delete().eq('id', id); carregar(); } }
-        function changeTab(t) { currentTab = t; render(); }
-        carregar();
-    </script>
-</body>
-</html>
+
+    async function toggle(id, estado) { await supabaseClient.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
+    async function remover(id) { if(confirm('Excluir?')) { await supabaseClient.from('lista_casa').delete().eq('id', id); carregar(); } }
+    function changeTab(t) { currentTab = t; render(); }
+    carregar();
+</script>
