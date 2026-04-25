@@ -132,17 +132,30 @@
             document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
         }
 
-        async function addItem() {
-            const n = document.getElementById('itemInput');
-            const p = document.getElementById('precoInput');
-            const u = document.getElementById('urgenciaInput');
-            const a = document.getElementById('areaInput');
-            if(n.value) {
-                await supabase.from('lista_casa').insert([{ nome: n.value, preco: parseFloat(p.value) || 0, urgencia: u.value, area: a.value }]);
-                n.value = ''; p.value = ''; carregar();
-            }
-        }
+   async function addItem() {
+    const n = document.getElementById('itemInput');
+    const p = document.getElementById('precoInput');
+    const u = document.getElementById('urgenciaInput');
+    const a = document.getElementById('areaInput');
 
+    if (n.value) {
+        // O comando 'insert' deve bater com os nomes das colunas no banco
+        const { error } = await supabase.from('lista_casa').insert([{ 
+            nome: n.value, 
+            preco: parseFloat(p.value) || 0, 
+            urgencia: u.value, 
+            area: a.value 
+        }]);
+
+        if (error) {
+            alert("Erro ao salvar: " + error.message);
+        } else {
+            n.value = ''; 
+            p.value = ''; 
+            carregar(); 
+        }
+    }
+}
         async function toggle(id, estado) { await supabase.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
         async function remover(id) { if(confirm('Excluir?')) { await supabase.from('lista_casa').delete().eq('id', id); carregar(); } }
         function changeTab(t) { currentTab = t; render(); }
