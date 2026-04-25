@@ -78,6 +78,16 @@
             </div>
         </div>
 
+        <nav class="flex gap-6 border-b border-slate-200 mb-8 overflow-x-auto pb-2">
+            <button onclick="changeTab('Todos')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Todos</button>
+            <button onclick="changeTab('Reforma')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Reforma</button>
+            <button onclick="changeTab('Cozinha')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Cozinha</button>
+            <button onclick="changeTab('Quarto')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Quarto</button>
+            <button onclick="changeTab('Sala')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Sala</button>
+            <button onclick="changeTab('Banheiro')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Banheiro</button>
+            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs whitespace-nowrap">Lavanderia</button>
+        </nav>
+
         <div id="listaContainer" class="space-y-4"></div>
     </div>
 
@@ -87,6 +97,7 @@
         const supabaseClient = supabase.createClient(_URL, _KEY);
 
         let itens = [];
+        let currentTab = 'Todos';
 
         async function carregar() {
             document.getElementById('status').innerText = '⏳ Carregando...';
@@ -99,7 +110,15 @@
             container.innerHTML = '';
             let total = 0, temos = 0;
 
-            itens.forEach((item) => {
+            // Atualiza visual das abas
+            document.querySelectorAll('.tab-btn').forEach(tab => {
+                tab.classList.toggle('tab-ativa', tab.innerText.toUpperCase() === currentTab.toUpperCase());
+            });
+
+            // Filtra por área
+            const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
+
+            filtrados.forEach((item) => {
                 const subtotal = (item.preco || 0) * (item.quantidade || 1);
                 if(!item.feito) total += subtotal; else temos++;
 
@@ -148,7 +167,7 @@
             const novoPreco = prompt("Preço unitário:", precoAtual);
             const novaQtd = prompt("Quantidade:", qtdAtual);
             
-            if (novoNome) {
+            if (novoNome !== null) {
                 await supabaseClient.from('lista_casa').update({ 
                     nome: novoNome, 
                     preco: parseFloat(novoPreco) || 0,
@@ -160,6 +179,7 @@
 
         async function toggle(id, estado) { await supabaseClient.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
         async function remover(id) { if(confirm('Excluir?')) { await supabaseClient.from('lista_casa').delete().eq('id', id); carregar(); } }
+        function changeTab(t) { currentTab = t; render(); }
         
         carregar();
     </script>
