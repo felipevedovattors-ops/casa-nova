@@ -21,7 +21,7 @@
         <header class="flex justify-between items-center mb-8">
             <div class="flex items-center gap-3">
                 <div class="bg-indigo-600 p-2 rounded-lg text-white text-2xl shadow-lg"><i class="fas fa-home"></i></div>
-                <h1 class="text-xl font-black text-indigo-900 tracking-tight uppercase">Minha Casa Online</h1>
+                <h1 class="text-xl font-black text-indigo-900 uppercase">Minha Casa Online</h1>
             </div>
             <div id="status" class="text-[10px] font-bold text-emerald-500 uppercase">● Sincronizado</div>
         </header>
@@ -42,18 +42,22 @@
         </div>
 
         <div class="bg-white rounded-3xl shadow-md border p-6 mb-10">
-            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
                 <div class="md:col-span-2">
                     <label class="text-[10px] font-bold text-slate-400 uppercase">Nome do Item</label>
-                    <input type="text" id="itemInput" placeholder="Ex: Geladeira..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none">
+                    <input type="text" id="itemInput" placeholder="Ex: Pratos..." class="w-full border-2 border-slate-100 rounded-xl px-4 py-2">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase">Preço (R$)</label>
-                    <input type="number" id="precoInput" placeholder="0.00" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 outline-none">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Preço Unit. (R$)</label>
+                    <input type="number" id="precoInput" placeholder="0.00" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase">Qtd</label>
+                    <input type="number" id="qtdInput" value="1" min="1" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase">Urgência</label>
-                    <select id="urgenciaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
+                    <select id="urgenciaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white font-bold text-xs">
                         <option value="urgencia-alta">ALTA</option>
                         <option value="urgencia-media" selected>MÉDIA</option>
                         <option value="urgencia-baixa">BAIXA</option>
@@ -61,7 +65,7 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-slate-400 uppercase">Área</label>
-                    <select id="areaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white">
+                    <select id="areaInput" class="w-full border-2 border-slate-100 rounded-xl px-4 py-2 bg-white font-bold text-xs">
                         <option value="Reforma">REFORMA</option>
                         <option value="Cozinha">COZINHA</option>
                         <option value="Quarto">QUARTO</option>
@@ -70,84 +74,94 @@
                         <option value="Lavanderia">LAVANDERIA</option>
                     </select>
                 </div>
-                <button onclick="addItem()" class="md:col-span-5 bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase active:scale-95 transition-all">Adicionar à Nuvem</button>
+                <button onclick="addItem()" class="md:col-span-6 bg-indigo-600 text-white font-black py-4 rounded-xl shadow-lg uppercase active:scale-95 transition-all">Adicionar à Nuvem</button>
             </div>
         </div>
-
-        <nav class="flex gap-6 border-b border-slate-200 mb-8 overflow-x-auto pb-2">
-            <button onclick="changeTab('Todos')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Todos</button>
-            <button onclick="changeTab('Reforma')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Reforma</button>
-            <button onclick="changeTab('Cozinha')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Cozinha</button>
-            <button onclick="changeTab('Quarto')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Quarto</button>
-            <button onclick="changeTab('Sala')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Sala</button>
-            <button onclick="changeTab('Banheiro')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Banheiro</button>
-            <button onclick="changeTab('Lavanderia')" class="tab-btn pb-3 px-2 text-slate-400 font-bold uppercase text-xs">Lavanderia</button>
-        </nav>
 
         <div id="listaContainer" class="space-y-4"></div>
     </div>
 
-   <script>
-    const _URL = 'https://sqzdplfetyykxgwcyxnv.supabase.co';
-    const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
-    
-    // Mudei o nome aqui para 'supabaseClient' para não dar erro
-    const supabaseClient = supabase.createClient(_URL, _KEY);
+    <script>
+        const _URL = 'https://sqzdplfetyykxgwcyxnv.supabase.co';
+        const _KEY = 'sb_publishable_KO1IAk-uOaxmBNar2sHsQw_XI_XjItw';
+        const supabaseClient = supabase.createClient(_URL, _KEY);
 
-    let itens = [];
-    let currentTab = 'Todos';
+        let itens = [];
 
-    async function carregar() {
-        document.getElementById('status').innerText = '⏳ Carregando...';
-        const { data, error } = await supabaseClient.from('lista_casa').select('*').order('id', { ascending: false });
-        if (data) { itens = data; render(); document.getElementById('status').innerText = '● Sincronizado'; }
-    }
-
-    function render() {
-        const container = document.getElementById('listaContainer');
-        container.innerHTML = '';
-        let total = 0, temos = 0;
-
-        document.querySelectorAll('.tab-btn').forEach(tab => {
-            tab.classList.toggle('tab-ativa', tab.innerText.toUpperCase() === currentTab.toUpperCase());
-        });
-
-        const filtrados = currentTab === 'Todos' ? itens : itens.filter(i => i.area === currentTab);
-
-        filtrados.forEach((item) => {
-            if(!item.feito) total += item.preco; else temos++;
-            container.innerHTML += `
-                <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
-                    <div class="flex items-center gap-4">
-                        <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg">
-                        <div>
-                            <p class="font-black text-slate-800 text-lg">${item.nome}</p>
-                            <p class="text-xs font-bold text-indigo-600 uppercase">${item.area} - R$ ${Number(item.preco).toLocaleString('pt-BR')}</p>
-                        </div>
-                    </div>
-                    <button onclick="remover(${item.id})" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
-                </div>`;
-        });
-
-        document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
-        document.getElementById('count-temos').innerText = temos;
-        document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
-    }
-
-    async function addItem() {
-        const n = document.getElementById('itemInput');
-        const p = document.getElementById('precoInput');
-        const u = document.getElementById('urgenciaInput');
-        const a = document.getElementById('areaInput');
-        if(n.value) {
-            // Usando o nome correto aqui também
-            await supabaseClient.from('lista_casa').insert([{ nome: n.value, preco: parseFloat(p.value) || 0, urgencia: u.value, area: a.value }]);
-            n.value = ''; p.value = ''; carregar();
+        async function carregar() {
+            document.getElementById('status').innerText = '⏳ Carregando...';
+            const { data, error } = await supabaseClient.from('lista_casa').select('*').order('id', { ascending: false });
+            if (data) { itens = data; render(); document.getElementById('status').innerText = '● Sincronizado'; }
         }
-    }
 
-    async function toggle(id, estado) { await supabaseClient.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
-    async function remover(id) { if(confirm('Excluir?')) { await supabaseClient.from('lista_casa').delete().eq('id', id); carregar(); } }
-    function changeTab(t) { currentTab = t; render(); }
-    carregar();
-</script>
+        function render() {
+            const container = document.getElementById('listaContainer');
+            container.innerHTML = '';
+            let total = 0, temos = 0;
+
+            itens.forEach((item) => {
+                const subtotal = (item.preco || 0) * (item.quantidade || 1);
+                if(!item.feito) total += subtotal; else temos++;
+
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border flex justify-between items-center ${item.feito ? 'feito' : item.urgencia}">
+                        <div class="flex items-center gap-4">
+                            <input type="checkbox" ${item.feito ? 'checked' : ''} onchange="toggle(${item.id}, ${item.feito})" class="w-7 h-7 rounded-lg">
+                            <div>
+                                <p class="font-black text-slate-800 text-lg">${item.nome} (${item.quantidade || 1}x)</p>
+                                <p class="text-xs font-bold text-indigo-600 uppercase">${item.area} - Total: R$ ${subtotal.toLocaleString('pt-BR')}</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editar(${item.id}, '${item.nome}', ${item.preco}, ${item.quantidade || 1})" class="text-amber-500 p-2"><i class="fas fa-edit"></i></button>
+                            <button onclick="remover(${item.id})" class="text-red-500 p-2"><i class="fas fa-trash-alt"></i></button>
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('total-preco').innerText = "R$ " + total.toLocaleString('pt-BR');
+            document.getElementById('count-temos').innerText = temos;
+            document.getElementById('progresso-texto').innerText = itens.length ? Math.round((temos/itens.length)*100) + "%" : "0%";
+        }
+
+        async function addItem() {
+            const n = document.getElementById('itemInput');
+            const p = document.getElementById('precoInput');
+            const q = document.getElementById('qtdInput');
+            const u = document.getElementById('urgenciaInput');
+            const a = document.getElementById('areaInput');
+
+            if(n.value) {
+                await supabaseClient.from('lista_casa').insert([{ 
+                    nome: n.value, 
+                    preco: parseFloat(p.value) || 0, 
+                    quantidade: parseInt(q.value) || 1,
+                    urgencia: u.value, 
+                    area: a.value 
+                }]);
+                n.value = ''; p.value = ''; q.value = '1'; carregar();
+            }
+        }
+
+        async function editar(id, nomeAtual, precoAtual, qtdAtual) {
+            const novoNome = prompt("Nome do item:", nomeAtual);
+            const novoPreco = prompt("Preço unitário:", precoAtual);
+            const novaQtd = prompt("Quantidade:", qtdAtual);
+            
+            if (novoNome) {
+                await supabaseClient.from('lista_casa').update({ 
+                    nome: novoNome, 
+                    preco: parseFloat(novoPreco) || 0,
+                    quantidade: parseInt(novaQtd) || 1
+                }).eq('id', id);
+                carregar();
+            }
+        }
+
+        async function toggle(id, estado) { await supabaseClient.from('lista_casa').update({ feito: !estado }).eq('id', id); carregar(); }
+        async function remover(id) { if(confirm('Excluir?')) { await supabaseClient.from('lista_casa').delete().eq('id', id); carregar(); } }
+        
+        carregar();
+    </script>
+</body>
+</html>
